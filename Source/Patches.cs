@@ -92,52 +92,65 @@ namespace SameSpot
 		}
 	}
 
-	[HarmonyPatch]
-	static class RCellFinder_BestOrderedGotoDestNear_Patch
-	{
-		public static MethodBase TargetMethod()
-		{
-			return typeof(RCellFinder)
-				.GetNestedTypes(AccessTools.all)
-				.SelectMany(t => AccessTools.GetDeclaredMethods(t))
-				.First(m => m.Name.Contains($"<{nameof(RCellFinder.BestOrderedGotoDestNear)}"));
-		}
+    [HarmonyPatch]
+    static class RCellFinder_BestOrderedGotoDestNear_Patch
+    {
+        public static MethodBase TargetMethod()
+        {
+            // Get the type of RCellFinder directly
+            var rCellFinderType = typeof(RCellFinder);
 
-		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			return instructions
+            // Log all methods in RCellFinder (optional for debugging)
+            var methods = AccessTools.GetDeclaredMethods(rCellFinderType);
+            foreach (var method in methods)
+            {
+                Log.Message($"Found method: {method.Name} in type: {rCellFinderType.Name}, IsPublic: {method.IsPublic}, IsStatic: {method.IsStatic}");
+            }
 
-				.MethodReplacer(
-					AccessTools.Method(typeof(PawnDestinationReservationManager), nameof(PawnDestinationReservationManager.CanReserve)),
-					AccessTools.Method(typeof(Main), nameof(Main.CustomCanReserve))
-				)
+            // Attempt to find the target method directly
+            var targetMethod = methods
+                .FirstOrDefault(m => m.Name == nameof(RCellFinder.BestOrderedGotoDestNear) && m.IsStatic);
 
-				.MethodReplacer(
-					AccessTools.Method(typeof(GenGrid), nameof(GenGrid.Standable)),
-					AccessTools.Method(typeof(Main), nameof(Main.CustomStandable))
-				)
+            if (targetMethod == null)
+            {
+                Log.Error("Target method BestOrderedGotoDestNear not found.");
+            }
 
-				.MethodReplacer(
-					AccessTools.Method(typeof(GridsUtility), nameof(GridsUtility.GetThingList)),
-					AccessTools.Method(typeof(Main), nameof(Main.GetThingList))
-				);
-		}
-	}
+            return targetMethod;
+        }
 
-	[HarmonyPatch(typeof(JobGiver_MoveToStandable), nameof(JobGiver_MoveToStandable.TryGiveJob))]
-	static class JobGiver_MoveToStandable_TryGiveJob_Patch
-	{
-		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			return instructions
-				.MethodReplacer(
-					AccessTools.Method(typeof(GridsUtility), nameof(GridsUtility.GetThingList)),
-					AccessTools.Method(typeof(Main), nameof(Main.GetThingList))
-				);
-		}
-	}
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            return instructions
+                .MethodReplacer(
+                    AccessTools.Method(typeof(PawnDestinationReservationManager), nameof(PawnDestinationReservationManager.CanReserve)),
+                    AccessTools.Method(typeof(Main), nameof(Main.CustomCanReserve))
+                )
+                .MethodReplacer(
+                    AccessTools.Method(typeof(GenGrid), nameof(GenGrid.Standable)),
+                    AccessTools.Method(typeof(Main), nameof(Main.CustomStandable))
+                )
+                .MethodReplacer(
+                    AccessTools.Method(typeof(GridsUtility), nameof(GridsUtility.GetThingList)),
+                    AccessTools.Method(typeof(Main), nameof(Main.GetThingList))
+                );
+        }
+    }
 
-	[HarmonyPatch(typeof(JoyGiver_InteractBuildingInteractionCell), nameof(JoyGiver_InteractBuildingInteractionCell.TryGivePlayJob))]
+    [HarmonyPatch(typeof(JobGiver_MoveToStandable), nameof(JobGiver_MoveToStandable.TryGiveJob))]
+    static class JobGiver_MoveToStandable_TryGiveJob_Patch
+    {
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            return instructions
+                .MethodReplacer(
+                    AccessTools.Method(typeof(GridsUtility), nameof(GridsUtility.GetThingList)),
+                    AccessTools.Method(typeof(Main), nameof(Main.GetThingList))
+                );
+        }
+    }
+
+    [HarmonyPatch(typeof(JoyGiver_InteractBuildingInteractionCell), nameof(JoyGiver_InteractBuildingInteractionCell.TryGivePlayJob))]
 	static class JoyGiver_InteractBuildingInteractionCell_TryGivePlayJob_Patch
 	{
 		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

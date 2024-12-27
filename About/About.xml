@@ -3,7 +3,7 @@
 	<name>SameSpot</name>
 	<author>Andreas Pardeike, Louize</author>
 	<supportedVersions>
-		<1.5>
+		<li>1.5</li>
 	</supportedVersions>
 	<modDependencies>
 		<li>
