@@ -284,7 +284,7 @@ namespace SameSpot
                 Main.draggedColonists.Do(colonist =>
                 {
                     var newPosition = colonist.startPosition + mouseCell - Main.dragStart;
-                    Colonist.UpdateOrderPos(Main.draggedColonists, newPosition);
+                    colonist.designation = newPosition; // Set the designation for each colonist
                 });
 
                 Main.lastCell = mouseCell;
