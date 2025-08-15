@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build SameSpot",
+      "type": "shell",
+      "command": "C:\\Program Files\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+      "args": [
+        "${workspaceFolder}\\SameSpot.csproj",
+        "/p:Configuration=Debug",
+        "/p:Platform=x64"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
